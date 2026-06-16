@@ -18,9 +18,5 @@ plugins {
 
 dependencies {
     implementation(libs.edc.fc.spi.crawler)
-    //implementation(libs.edc.fc.core)
-    // todo: use 2025 once it is used everywhere
-    // runtimeOnly(libs.edc.fc.core2025)
-    //implementation(libs.edc.fc.core08)
-    //implementation(libs.edc.fc.api)
+    implementation(libs.edc.dsp) // protocol webhook
 }

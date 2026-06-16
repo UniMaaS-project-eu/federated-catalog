@@ -36,19 +36,19 @@ public class KeycloakHttpClient {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public KeycloakHttpClient(String config_path) {
-        KeycloakConfig config = new KeycloakConfig(Path.of(config_path));
-        this.admin_user = config.admin_user();
-        this.admin_password = config.admin_password();
-        this.host = config.host();
-        this.port = config.port();
-        this.realm = config.realm();
-        this.attribute = config.attribute();
-        this.inferFromDID=config.inferFromDID();
+    public KeycloakHttpClient() {
+        //KeycloakConfig config = new KeycloakConfig(Path.of(config_path));
+        this.admin_user = System.getProperty("keycloak_admin");
+        this.admin_password = System.getProperty("keycloak_admin_password"); 
+        this.host = System.getProperty("keycloak_host");
+        this.port = System.getProperty("keycloak_port");
+        this.realm = System.getProperty("keycloak_realm");
+        this.attribute = System.getProperty("keycloak_attribute");
+        this.inferFromDID= Boolean.getBoolean(System.getProperty("keycloak_inferFromDID"));
         this.http_client = HttpClient.newBuilder()
         .version(HttpClient.Version.HTTP_1_1)
         .build();
-        this.token = InitializeToken(config.token()); 
+        this.token = InitializeToken(System.getProperty("keycloak_token")); 
     }
 
     public String InitializeToken(String token){

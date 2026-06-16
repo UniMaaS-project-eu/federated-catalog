@@ -7,15 +7,13 @@ import org.eclipse.edc.crawler.spi.TargetNodeDirectory;
 
 public class KeycloakNodeDirectory implements TargetNodeDirectory{
 
-    private final String config_path;
 
-    public KeycloakNodeDirectory(String config_path){
-        this.config_path = config_path;
+    public KeycloakNodeDirectory(){
     }
 
 @Override
     public List<TargetNode> getAll() {
-        KeycloakHttpClient httpClient = new KeycloakHttpClient(config_path);
+        KeycloakHttpClient httpClient = new KeycloakHttpClient();
         return httpClient.getParticipantsTargetNode();
     }
 

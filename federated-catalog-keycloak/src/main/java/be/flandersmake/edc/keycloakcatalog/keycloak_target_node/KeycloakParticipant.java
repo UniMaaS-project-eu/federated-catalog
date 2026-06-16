@@ -9,6 +9,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.edc.crawler.spi.TargetNode;
 
@@ -105,6 +106,7 @@ public TargetNode toTargetNode() {
 
             // Build TargetNode
            System.err.println("Target node from did:" + rawDid + " name:" + connectorName + " url:" + catalogUrl);
+            //TargetNode target =  new TargetNode(connectorName, rawDid, catalogUrl, List.of("dataspace-protocol-http"));
             TargetNode target =  new TargetNode(connectorName, rawDid, catalogUrl, List.of("dataspace-protocol-http"));
 
             System.err.println("TargetNode ID = " + target.id());
