@@ -1,5 +1,6 @@
 package be.flandersmake.edc.keycloakcatalog.keycloak_target_node;
 
+import java.io.Console;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -38,7 +39,7 @@ public class KeycloakHttpClient {
 
     public KeycloakHttpClient() {
         //KeycloakConfig config = new KeycloakConfig(Path.of(config_path));
-        this.admin_user = System.getProperty("keycloak_admin");
+        this.admin_user = System.getProperty("keycloak_admin_user");
         this.admin_password = System.getProperty("keycloak_admin_password"); 
         this.host = System.getProperty("keycloak_host");
         this.port = System.getProperty("keycloak_port");
