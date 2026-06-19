@@ -42,7 +42,7 @@ public class KeycloakHttpClient {
         this.http_client = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .build();
-        this.token = null;
+        this.token = this.InitializeToken(null);
     }
 
     public String InitializeToken(String token) {
@@ -135,8 +135,10 @@ public class KeycloakHttpClient {
         try {
             JsonNode root = mapper.readTree(json);
 
-            System.out.println("Node type = " + root.getNodeType());
-            System.out.println("Array size = " + root.size());
+            System.out.println("KeycloakHttpClient.parseParticipantsToTargetNode");
+            System.out.println(".. json: " + json);
+            System.out.println(".. Node type: " + root.getNodeType());
+            System.out.println(".. Array size: " + root.size());
             List<TargetNode> participants = new ArrayList<>();
 
             for (JsonNode client : root) {

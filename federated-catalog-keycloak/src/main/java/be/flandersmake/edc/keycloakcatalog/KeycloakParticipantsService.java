@@ -48,7 +48,7 @@ public class KeycloakParticipantsService implements ServiceExtension {
         String host,
         @Setting(key = "keycloak_port", description = "Keycloak Port", defaultValue = "5080")
         String port,
-        @Setting(key = "keycloak_realm", description = " Keycloak Realm", defaultValue = "master")
+        @Setting(key = "keycloak_realm", description = " Keycloak Realm", defaultValue = "unimaas")
         String realm,
         @Setting(key = "keycloak_attribute", description = "Keycloak Attribute", defaultValue = "clientId")
         String attribute,
