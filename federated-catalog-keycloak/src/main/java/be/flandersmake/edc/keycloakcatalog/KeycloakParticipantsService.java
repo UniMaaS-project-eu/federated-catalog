@@ -21,12 +21,10 @@ public class KeycloakParticipantsService implements ServiceExtension {
         return "Keycloak Target Node Directory Extension";
     }
 
-
     @Override
     public void initialize(ServiceExtensionContext context) {
         monitor.info("Initializing Keycloak TargetNodeDirectory");
 
-    
         // Create your directory
         var directory = new KeycloakNodeDirectory(this.keycloakConfiguration);
 
@@ -35,26 +33,17 @@ public class KeycloakParticipantsService implements ServiceExtension {
 
         monitor.info("Keycloak TargetNodeDirectory registered");
     }
+
     @Configuration
     private KeykloadConfiguration keycloakConfiguration;
-    
+
     @Settings
-   public record KeykloadConfiguration(
-        @Setting(key = "keycloak_admin_user", description = "Keycloak Admin User", defaultValue = "admin")
-        String admin_user,
-        @Setting(key = "keycloak_admin_password", description = "Keycloak Admin Password", defaultValue = "admin")
-        String admin_password,
-        @Setting(key = "keycloak_host", description = "Keycloak Host", defaultValue = "localhost")
-        String host,
-        @Setting(key = "keycloak_port", description = "Keycloak Port", defaultValue = "5080")
-        String port,
-        @Setting(key = "keycloak_realm", description = " Keycloak Realm", defaultValue = "unimaas")
-        String realm,
-        @Setting(key = "keycloak_attribute", description = "Keycloak Attribute", defaultValue = "clientId")
-        String attribute,
-        @Setting(key = "keycloak_inferFromDID", description = "Infer from ID", defaultValue = "true")
-        String inferFromDID
-//        @Setting(key = "keycloak_token", description = "Admin token", defaultValue = "")
-//        String token
-    ) {};
+    public record KeykloadConfiguration(
+            @Setting(key = "keycloak_admin_user", description = "Keycloak Admin User", defaultValue = "admin") String admin_user,
+            @Setting(key = "keycloak_admin_password", description = "Keycloak Admin Password", defaultValue = "admin") String admin_password,
+            @Setting(key = "keycloak_host", description = "Keycloak Host", defaultValue = "localhost") String host,
+            @Setting(key = "keycloak_port", description = "Keycloak Port", defaultValue = "5080") String port,
+            @Setting(key = "keycloak_realm", description = " Keycloak Realm", defaultValue = "unimaas") String realm
+    ) {
+    };
 }

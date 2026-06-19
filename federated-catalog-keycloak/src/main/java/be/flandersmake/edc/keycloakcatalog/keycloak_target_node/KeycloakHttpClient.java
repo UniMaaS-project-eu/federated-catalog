@@ -15,31 +15,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import be.flandersmake.edc.keycloakcatalog.KeycloakParticipantsService;
 
-
 //class for querying keycloack clients in the unimaass realm
 public class KeycloakHttpClient {
-    
+
     private HttpClient http_client;
     private final String host;
     private final String token;
     private final String port;
     private final String realm;
-    private final Boolean inferFromDID;
-    private final String attribute;
     private final String admin_user;
     private final String admin_password;
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
     public KeycloakHttpClient(KeycloakParticipantsService.KeykloadConfiguration keycloakConfiguration) {
-        this.admin_user = keycloakConfiguration.admin_user(); //System.getProperty("keycloak_admin_user");
-        this.admin_password = keycloakConfiguration.admin_password(); //System.getProperty("keycloak_admin_password");
+        this.admin_user = keycloakConfiguration.admin_user(); // System.getProperty("keycloak_admin_user");
+        this.admin_password = keycloakConfiguration.admin_password(); // System.getProperty("keycloak_admin_password");
         this.host = keycloakConfiguration.host();
         this.port = keycloakConfiguration.port();
         this.realm = keycloakConfiguration.realm();
-        this.attribute = keycloakConfiguration.attribute();
-        String inferFromDIDStr = keycloakConfiguration.inferFromDID();
-        this.inferFromDID = Boolean.parseBoolean(inferFromDIDStr);
         this.http_client = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .build();
@@ -83,30 +77,6 @@ public class KeycloakHttpClient {
         }
     }
 
-    public List<KeycloakParticipant> getParticipants() {
-        List<KeycloakParticipant> participants = new ArrayList<>();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(host + ":" + port + "/admin/realms/" + realm + "/clients"))
-                .GET()
-                .header("Accept", "application/json")
-                .header("Authorization", "Bearer " + token) // you MUST include this
-                .build();
-
-        HttpResponse<String> response;
-        try {
-            response = http_client.send(request, HttpResponse.BodyHandlers.ofString());
-            return parseParticipants(response.body());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return participants;
-
-    }
-
     public List<TargetNode> getParticipantsTargetNode() {
         List<TargetNode> participants = new ArrayList<>();
         HttpRequest request = HttpRequest.newBuilder()
@@ -143,75 +113,20 @@ public class KeycloakHttpClient {
             List<TargetNode> participants = new ArrayList<>();
 
             for (JsonNode client : root) {
-
-                if (!attribute.equals("clientId")) {
-                    JsonNode attributes = client.get("attributes");
-
-                    if (attributes != null && attributes.has(attribute)) {
-                        String clientId = client.path("clientId").asText();
-                        String attribute_value = attributes.path(attribute).asText();
-
-                        System.out.println("KeycloakHttpClient.parseParticipantsToTargetNode, new participant 1");
-                        System.out.println(".. clientId: " + clientId);
-                        System.out.println(".. attribute_value: " + attribute_value);
-                        System.out.println(".. inferFromDID: " + inferFromDID);
-                        participants
-                                .add(new KeycloakParticipant(clientId, attribute_value, inferFromDID).toTargetNode());
-                    }
-                } else {
                     String clientId = client.path("clientId").asText();
                     if (!clientId.startsWith("did:web")) {
                         continue; // skip this client
                     }
 
-                    System.out.println("KeycloakHttpClient.parseParticipantsToTargetNode, new participant 1");
+                    System.out.println("KeycloakHttpClient.parseParticipantsToTargetNode, new participant 2");
                     System.out.println(".. clientId: " + clientId);
-                    System.out.println(".. attribute_value: ");
-                    System.out.println(".. inferFromDID: " + inferFromDID);
-                    participants.add(new KeycloakParticipant(clientId, "", inferFromDID).toTargetNode());
-
-                }
-
+                    participants.add(new KeycloakParticipant(clientId).toTargetNode());
             }
 
             return participants;
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse Keycloak client list", e);
+            throw new RuntimeException("KeycloakHttpClient: Failed to parse Keycloak client list", e);
         }
     }
-
-    public List<KeycloakParticipant> parseParticipants(String json) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(json);
-
-            List<KeycloakParticipant> participants = new ArrayList<>();
-
-            for (JsonNode client : root) {
-
-                if (attribute != "clientId") {
-                    JsonNode attributes = client.get("attributes");
-
-                    if (attributes != null && attributes.has(attribute)) {
-                        String clientId = client.path("clientId").asText();
-                        String attribute_value = attributes.path(attribute).asText();
-
-                        participants.add(new KeycloakParticipant(clientId, attribute_value, inferFromDID));
-                    }
-                } else {
-                    String clientId = client.path("clientId").asText();
-                    participants.add(new KeycloakParticipant(clientId, "", inferFromDID));
-
-                }
-
-            }
-
-            return participants;
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to parse Keycloak client list", e);
-        }
-    }
-
 }

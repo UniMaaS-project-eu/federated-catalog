@@ -13,6 +13,7 @@ public class KeycloakNodeDirectory implements TargetNodeDirectory{
         this.keycloakConfiguration = config;
     }
 
+    // method used by the crawler for getting the crawling targets
     @Override
     public List<TargetNode> getAll() {
         KeycloakHttpClient httpClient = new KeycloakHttpClient(this.keycloakConfiguration);
@@ -21,14 +22,12 @@ public class KeycloakNodeDirectory implements TargetNodeDirectory{
 
     @Override
     public void insert(TargetNode node) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Method unsupported for Keycloak based implementation");
+        throw new UnsupportedOperationException("KeycloakNodeDirectory: method insert not implemented");
     }
 
     @Override
     public TargetNode remove(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Method unsupported to Keycloak based implementation");
+        throw new UnsupportedOperationException("KeycloakNodeDirectory: method remove not implemented");
     }
 
 };
