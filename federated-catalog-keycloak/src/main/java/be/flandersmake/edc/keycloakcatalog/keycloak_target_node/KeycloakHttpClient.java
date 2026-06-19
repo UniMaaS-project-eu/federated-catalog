@@ -1,30 +1,24 @@
 package be.flandersmake.edc.keycloakcatalog.keycloak_target_node;
 
-import java.io.Console;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
 import org.eclipse.edc.crawler.spi.TargetNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import be.flandersmake.edc.keycloakcatalog.KeycloakParticipantsService;
+
+
 //class for querying keycloack clients in the unimaass realm
 public class KeycloakHttpClient {
-
+    
     private HttpClient http_client;
     private final String host;
     private final String token;
@@ -37,47 +31,70 @@ public class KeycloakHttpClient {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public KeycloakHttpClient() {
-        //KeycloakConfig config = new KeycloakConfig(Path.of(config_path));
-        this.admin_user = System.getProperty("keycloak_admin_user");
-        this.admin_password = System.getProperty("keycloak_admin_password"); 
-        this.host = System.getProperty("keycloak_host");
-        this.port = System.getProperty("keycloak_port");
-        this.realm = System.getProperty("keycloak_realm");
-        this.attribute = System.getProperty("keycloak_attribute");
-        this.inferFromDID= Boolean.getBoolean(System.getProperty("keycloak_inferFromDID"));
+    public KeycloakHttpClient(KeycloakParticipantsService.KeykloadConfiguration keycloakConfiguration) {
+        this.admin_user = keycloakConfiguration.admin_user(); //System.getProperty("keycloak_admin_user");
+        this.admin_password = keycloakConfiguration.admin_password(); //System.getProperty("keycloak_admin_password");
+        this.host = keycloakConfiguration.host();
+        this.port = keycloakConfiguration.port();
+        this.realm = keycloakConfiguration.realm();
+        this.attribute = keycloakConfiguration.attribute();
+        this.inferFromDID = Boolean.getBoolean(keycloakConfiguration.inferFromDID());
         this.http_client = HttpClient.newBuilder()
-        .version(HttpClient.Version.HTTP_1_1)
-        .build();
-        this.token = InitializeToken(System.getProperty("keycloak_token")); 
+                .version(HttpClient.Version.HTTP_1_1)
+                .build();
+        this.token = null;
     }
 
-    public String InitializeToken(String token){
-        if(token != null){
+    public String InitializeToken(String token) {
+        if (token != null) {
             return token;
-        } else{
+        } else {
             HttpClient client = HttpClient.newHttpClient();
 
             String form = "client_id=admin-cli" +
-              "&username=" + admin_user +
-              "&password=" + admin_password +
-              "&grant_type=password";
+                    "&username=" + admin_user +
+                    "&password=" + admin_password +
+                    "&grant_type=password";
 
-        HttpRequest tokenRequest = HttpRequest.newBuilder()
-        .uri(URI.create("http://" + host + ":" + port + "/realms/master/protocol/openid-connect/token"))
-        .header("Content-Type", "application/x-www-form-urlencoded")
-        .POST(HttpRequest.BodyPublishers.ofString(form))
-        .build();
+            HttpRequest tokenRequest = HttpRequest.newBuilder()
+                    .uri(URI.create("http://" + host + ":" + port + "/realms/master/protocol/openid-connect/token"))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .POST(HttpRequest.BodyPublishers.ofString(form))
+                    .build();
 
-        try {
-            HttpResponse<String> response = client.send(tokenRequest, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-            throw new RuntimeException("Failed to get token. Status: " + response.statusCode() +
-                    " Body: " + response.body());
+            try {
+                HttpResponse<String> response = client.send(tokenRequest, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() != 200) {
+                    throw new RuntimeException("Failed to get token. Status: " + response.statusCode() +
+                            " Body: " + response.body());
+                }
+
+                JsonNode json = mapper.readTree(response.body());
+                return json.get("access_token").asText();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return null;
         }
+    }
 
-        JsonNode json = mapper.readTree(response.body());
-        return json.get("access_token").asText();
+    public List<KeycloakParticipant> getParticipants() {
+        List<KeycloakParticipant> participants = new ArrayList<>();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(host + ":" + port + "/admin/realms/" + realm + "/clients"))
+                .GET()
+                .header("Accept", "application/json")
+                .header("Authorization", "Bearer " + token) // you MUST include this
+                .build();
+
+        HttpResponse<String> response;
+        try {
+            response = http_client.send(request, HttpResponse.BodyHandlers.ofString());
+            return parseParticipants(response.body());
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -85,132 +102,105 @@ public class KeycloakHttpClient {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-            return null;
-        } 
-    }
-
-    public List<KeycloakParticipant> getParticipants() {
-        List<KeycloakParticipant> participants = new ArrayList<>();
-HttpRequest request = HttpRequest.newBuilder()
-        .uri(URI.create(host + ":" + port + "/admin/realms/" + realm + "/clients"))
-        .GET()
-        .header("Accept", "application/json")
-        .header("Authorization", "Bearer " + token) // you MUST include this
-        .build();
-
-HttpResponse<String> response;
-try {
-    response = http_client.send(request, HttpResponse.BodyHandlers.ofString());
-    return parseParticipants(response.body());
-} catch (IOException e) {
-    // TODO Auto-generated catch block
-    e.printStackTrace();
-} catch (InterruptedException e) {
-    // TODO Auto-generated catch block
-    e.printStackTrace();
-}
-return participants;
+        return participants;
 
     }
 
-        public List<TargetNode> getParticipantsTargetNode() {
+    public List<TargetNode> getParticipantsTargetNode() {
         List<TargetNode> participants = new ArrayList<>();
-HttpRequest request = HttpRequest.newBuilder()
-        .uri(URI.create("http://" + host + ":" + port + "/admin/realms/" + realm + "/clients"))
-        .GET()
-        .header("Accept", "application/json")
-        .header("Authorization", "Bearer " + token) 
-        .build();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://" + host + ":" + port + "/admin/realms/" + realm + "/clients"))
+                .GET()
+                .header("Accept", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
 
-HttpResponse<String> response;
-try {
-    response = http_client.send(request, HttpResponse.BodyHandlers.ofString());
-    return parseParticipantsToTargetNode(response.body());
-} catch (IOException e) {
-    // TODO Auto-generated catch block
-    e.printStackTrace();
-} catch (InterruptedException e) {
-    // TODO Auto-generated catch block
-    e.printStackTrace();
-}
-return participants;
-
-    }
-
-    public List<TargetNode> parseParticipantsToTargetNode(String json){
-        
+        HttpResponse<String> response;
         try {
-        JsonNode root = mapper.readTree(json);
+            response = http_client.send(request, HttpResponse.BodyHandlers.ofString());
+            return parseParticipantsToTargetNode(response.body());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return participants;
 
-        System.out.println("Node type = " + root.getNodeType());
-        System.out.println("Array size = " + root.size());
-        List<TargetNode> participants = new ArrayList<>();
+    }
 
-        for (JsonNode client : root) {
-            
-            if(!attribute.equals("clientId")){
-            JsonNode attributes = client.get("attributes");
+    public List<TargetNode> parseParticipantsToTargetNode(String json) {
 
-            if (attributes != null && attributes.has(attribute)) {
-                String clientId = client.path("clientId").asText();
-                String attribute_value = attributes.path(attribute).asText();
+        try {
+            JsonNode root = mapper.readTree(json);
 
-                participants.add(new KeycloakParticipant(clientId, attribute_value, inferFromDID).toTargetNode());
-            }
-            }else {
-                String clientId = client.path("clientId").asText();
-                if(!clientId.startsWith("did:web")){
-                    continue; //skip this client
+            System.out.println("Node type = " + root.getNodeType());
+            System.out.println("Array size = " + root.size());
+            List<TargetNode> participants = new ArrayList<>();
+
+            for (JsonNode client : root) {
+
+                if (!attribute.equals("clientId")) {
+                    JsonNode attributes = client.get("attributes");
+
+                    if (attributes != null && attributes.has(attribute)) {
+                        String clientId = client.path("clientId").asText();
+                        String attribute_value = attributes.path(attribute).asText();
+
+                        participants
+                                .add(new KeycloakParticipant(clientId, attribute_value, inferFromDID).toTargetNode());
+                    }
+                } else {
+                    String clientId = client.path("clientId").asText();
+                    if (!clientId.startsWith("did:web")) {
+                        continue; // skip this client
+                    }
+
+                    participants.add(new KeycloakParticipant(clientId, "", inferFromDID).toTargetNode());
+
                 }
 
-                participants.add(new KeycloakParticipant(clientId, "", inferFromDID).toTargetNode());
-
             }
-            
+
+            return participants;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse Keycloak client list", e);
         }
-
-        return participants;
-
-    } catch (Exception e) {
-        throw new RuntimeException("Failed to parse Keycloak client list", e);
     }
-    }
-
 
     public List<KeycloakParticipant> parseParticipants(String json) {
-    try {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = mapper.readTree(json);
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(json);
 
-        List<KeycloakParticipant> participants = new ArrayList<>();
+            List<KeycloakParticipant> participants = new ArrayList<>();
 
-        for (JsonNode client : root) {
-            
-            if(attribute != "clientId"){
-            JsonNode attributes = client.get("attributes");
+            for (JsonNode client : root) {
 
-            if (attributes != null && attributes.has(attribute)) {
-                String clientId = client.path("clientId").asText();
-                String attribute_value = attributes.path(attribute).asText();
+                if (attribute != "clientId") {
+                    JsonNode attributes = client.get("attributes");
 
-                participants.add(new KeycloakParticipant(clientId, attribute_value, inferFromDID));
+                    if (attributes != null && attributes.has(attribute)) {
+                        String clientId = client.path("clientId").asText();
+                        String attribute_value = attributes.path(attribute).asText();
+
+                        participants.add(new KeycloakParticipant(clientId, attribute_value, inferFromDID));
+                    }
+                } else {
+                    String clientId = client.path("clientId").asText();
+                    participants.add(new KeycloakParticipant(clientId, "", inferFromDID));
+
+                }
+
             }
-            }else {
-                String clientId = client.path("clientId").asText();
-                participants.add(new KeycloakParticipant(clientId, "", inferFromDID));
 
-            }
-            
+            return participants;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse Keycloak client list", e);
         }
-
-        return participants;
-
-    } catch (Exception e) {
-        throw new RuntimeException("Failed to parse Keycloak client list", e);
     }
+
 }
-
-    
-}
-
-

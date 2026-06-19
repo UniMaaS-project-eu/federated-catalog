@@ -4,16 +4,18 @@ import java.util.List;
 
 import org.eclipse.edc.crawler.spi.TargetNode;
 import org.eclipse.edc.crawler.spi.TargetNodeDirectory;
+import be.flandersmake.edc.keycloakcatalog.KeycloakParticipantsService;
 
 public class KeycloakNodeDirectory implements TargetNodeDirectory{
+    private KeycloakParticipantsService.KeykloadConfiguration keycloakConfiguration;
 
-
-    public KeycloakNodeDirectory(){
+    public KeycloakNodeDirectory(KeycloakParticipantsService.KeykloadConfiguration config ){
+        this.keycloakConfiguration = config;
     }
 
-@Override
+    @Override
     public List<TargetNode> getAll() {
-        KeycloakHttpClient httpClient = new KeycloakHttpClient();
+        KeycloakHttpClient httpClient = new KeycloakHttpClient(this.keycloakConfiguration);
         return httpClient.getParticipantsTargetNode();
     }
 
@@ -29,6 +31,4 @@ public class KeycloakNodeDirectory implements TargetNodeDirectory{
         throw new UnsupportedOperationException("Method unsupported to Keycloak based implementation");
     }
 
-    
-
-}
+};

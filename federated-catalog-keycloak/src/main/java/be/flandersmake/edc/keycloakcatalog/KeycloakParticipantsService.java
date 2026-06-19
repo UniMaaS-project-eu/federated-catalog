@@ -1,7 +1,10 @@
 package be.flandersmake.edc.keycloakcatalog;
 
 import org.eclipse.edc.crawler.spi.TargetNodeDirectory;
+import org.eclipse.edc.runtime.metamodel.annotation.Configuration;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
+import org.eclipse.edc.runtime.metamodel.annotation.Setting;
+import org.eclipse.edc.runtime.metamodel.annotation.Settings;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.system.ServiceExtension;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
@@ -25,11 +28,33 @@ public class KeycloakParticipantsService implements ServiceExtension {
 
     
         // Create your directory
-        var directory = new KeycloakNodeDirectory();
+        var directory = new KeycloakNodeDirectory(this.keycloakConfiguration);
 
         // Register it as a service so the Federated Catalog can find it
         context.registerService(TargetNodeDirectory.class, directory);
 
         monitor.info("Keycloak TargetNodeDirectory registered");
     }
+    @Configuration
+    private KeykloadConfiguration keycloakConfiguration;
+    
+    @Settings
+   public record KeykloadConfiguration(
+        @Setting(key = "keycloak_admin_user", description = "Keycloak Admin User", defaultValue = "admin")
+        String admin_user,
+        @Setting(key = "keycloak_admin_password", description = "Keycloak Admin Password", defaultValue = "admin")
+        String admin_password,
+        @Setting(key = "keycloak_host", description = "Keycloak Host", defaultValue = "localhost")
+        String host,
+        @Setting(key = "keycloak_port", description = "Keycloak Port", defaultValue = "5080")
+        String port,
+        @Setting(key = "keycloak_realm", description = " Keycloak Realm", defaultValue = "master")
+        String realm,
+        @Setting(key = "keycloak_attribute", description = "Keycloak Attribute", defaultValue = "clientId")
+        String attribute,
+        @Setting(key = "keycloak_inferFromDID", description = "Infer from ID", defaultValue = "true")
+        String inferFromDID
+//        @Setting(key = "keycloak_token", description = "Admin token", defaultValue = "")
+//        String token
+    ) {};
 }
