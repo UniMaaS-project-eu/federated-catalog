@@ -38,7 +38,8 @@ public class KeycloakHttpClient {
         this.port = keycloakConfiguration.port();
         this.realm = keycloakConfiguration.realm();
         this.attribute = keycloakConfiguration.attribute();
-        this.inferFromDID = Boolean.getBoolean(keycloakConfiguration.inferFromDID());
+        String inferFromDIDStr = keycloakConfiguration.inferFromDID();
+        this.inferFromDID = Boolean.parseBoolean(inferFromDIDStr);
         this.http_client = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .build();
