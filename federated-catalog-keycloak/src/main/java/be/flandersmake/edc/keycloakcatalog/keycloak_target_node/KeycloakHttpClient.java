@@ -136,7 +136,7 @@ public class KeycloakHttpClient {
             JsonNode root = mapper.readTree(json);
 
             System.out.println("KeycloakHttpClient.parseParticipantsToTargetNode");
-            System.out.println(".. json: " + json);
+            //System.out.println(".. json: " + json);
             System.out.println(".. Node type: " + root.getNodeType());
             System.out.println(".. Array size: " + root.size());
             List<TargetNode> participants = new ArrayList<>();
@@ -150,6 +150,10 @@ public class KeycloakHttpClient {
                         String clientId = client.path("clientId").asText();
                         String attribute_value = attributes.path(attribute).asText();
 
+                        System.out.println("KeycloakHttpClient.parseParticipantsToTargetNode, new participant 1");
+                        System.out.println(".. clientId: " + clientId);
+                        System.out.println(".. attribute_value: " + attribute_value);
+                        System.out.println(".. inferFromDID: " + inferFromDID);
                         participants
                                 .add(new KeycloakParticipant(clientId, attribute_value, inferFromDID).toTargetNode());
                     }
@@ -159,6 +163,10 @@ public class KeycloakHttpClient {
                         continue; // skip this client
                     }
 
+                    System.out.println("KeycloakHttpClient.parseParticipantsToTargetNode, new participant 1");
+                    System.out.println(".. clientId: " + clientId);
+                    System.out.println(".. attribute_value: ");
+                    System.out.println(".. inferFromDID: " + inferFromDID);
                     participants.add(new KeycloakParticipant(clientId, "", inferFromDID).toTargetNode());
 
                 }
