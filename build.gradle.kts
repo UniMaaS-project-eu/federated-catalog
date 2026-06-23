@@ -17,7 +17,7 @@ dependencies {
     implementation("org.eclipse.edc:token-spi:0.14.1")
     implementation("org.eclipse.edc:http:0.14.1")
     runtimeOnly("org.eclipse.edc:dsp:0.14.1")
-    implementation("org.eclipse.edc:iam-mock:0.14.1")
+    //implementation("org.eclipse.edc:iam-mock:0.14.1")
     implementation("org.eclipse.edc:control-plane-aggregate-services:0.14.1")
     implementation(project(":launchers:standalone-federated-catalog:federated-catalog-keycloak"))
     implementation(project(":extensions:dcp-impl"))
@@ -30,7 +30,6 @@ dependencies {
     runtimeOnly(libs.edc.api.dsp.config) // json-ld expansion
     implementation("org.eclipse.edc:catalog-api:0.14.1")
     implementation("org.eclipse.edc:secrets-api:0.14.1")
-
 
     //my extensions
     //implementation(project(":extensions:federated-catalog-keycloak"))
