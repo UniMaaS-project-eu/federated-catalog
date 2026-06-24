@@ -29,7 +29,7 @@ public class KeycloakParticipant {
         if (!clientId.startsWith("did:web:")) {
             throw new IllegalStateException("The clientId does not start with did:web");
         }
-        // Example DID: did:web:localhost%3A9876:connector1
+        // Example DID: did:web:localhost%3A7093:connector1
         String withoutPrefix = clientId.substring("did:web:".length());
         String[] parts = withoutPrefix.split(":");
 
