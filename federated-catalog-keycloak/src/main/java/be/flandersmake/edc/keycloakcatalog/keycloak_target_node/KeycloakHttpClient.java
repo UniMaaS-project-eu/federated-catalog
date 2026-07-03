@@ -29,8 +29,8 @@ public class KeycloakHttpClient {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     public KeycloakHttpClient(KeycloakParticipantsService.KeykloadConfiguration keycloakConfiguration) {
-        this.admin_user = keycloakConfiguration.admin_user(); // System.getProperty("keycloak_admin_user");
-        this.admin_password = keycloakConfiguration.admin_password(); // System.getProperty("keycloak_admin_password");
+        this.admin_user = keycloakConfiguration.admin_user(); 
+        this.admin_password = keycloakConfiguration.admin_password(); 
         this.host = keycloakConfiguration.host();
         this.port = keycloakConfiguration.port();
         this.realm = keycloakConfiguration.realm();
