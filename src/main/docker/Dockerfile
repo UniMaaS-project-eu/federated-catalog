@@ -9,9 +9,7 @@ RUN apk --no-cache add curl
 
 WORKDIR /app
 
-COPY ${JAR} standalone-catalog.jar
-
-COPY assets/keycloak/keycloak.properties /app/keycloak.properties
+COPY ${JAR} standalone-federated-catalog.jar
 
 EXPOSE 39191
 
@@ -24,6 +22,6 @@ HEALTHCHECK --interval=5s --timeout=5s --retries=10 CMD curl --fail http://local
 # ARG can not be used in ENTRYPOINT so storing value in an ENV variable
 ENV ENV_JVM_ARGS=$JVM_ARGS
 ENV ENV_APPINSIGHTS_AGENT_VERSION=$APPINSIGHTS_AGENT_VERSION
-ENV KEYCLOAK_CONFIG_PATH="/app/keycloak.properties" 
+
 # keycloak config path for now for testing purposes - should be moved somewhere afterwards
-ENTRYPOINT [ "sh", "-c", "exec java $ENV_JVM_ARGS -jar standalone-catalog.jar --log-level=debug"]
+ENTRYPOINT [ "sh", "-c", "exec java $ENV_JVM_ARGS -jar standalone-federated-catalog.jar --log-level=debug"]

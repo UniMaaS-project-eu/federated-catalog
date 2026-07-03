@@ -51,7 +51,7 @@ var distZip = tasks.getByName("distZip")
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     mergeServiceFiles()
-    archiveFileName.set("standalone-catalog.jar")
+    archiveFileName.set("standalone-federated-catalog.jar")
     dependsOn(distTar, distZip)
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
