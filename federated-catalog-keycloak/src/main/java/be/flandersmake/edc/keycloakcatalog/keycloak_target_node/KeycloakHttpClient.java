@@ -29,8 +29,8 @@ public class KeycloakHttpClient {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     public KeycloakHttpClient(KeycloakParticipantsService.KeykloadConfiguration keycloakConfiguration) {
-        this.admin_user = keycloakConfiguration.admin_user(); 
-        this.admin_password = keycloakConfiguration.admin_password(); 
+        this.admin_user = keycloakConfiguration.admin_user();
+        this.admin_password = keycloakConfiguration.admin_password();
         this.host = keycloakConfiguration.host();
         this.port = keycloakConfiguration.port();
         this.realm = keycloakConfiguration.realm();
@@ -107,20 +107,26 @@ public class KeycloakHttpClient {
             JsonNode root = mapper.readTree(json);
 
             System.out.println("KeycloakHttpClient.parseParticipantsToTargetNode");
-            //System.out.println(".. json: " + json);
+            // System.out.println(".. json: " + json);
             System.out.println(".. Node type: " + root.getNodeType());
             System.out.println(".. Array size: " + root.size());
             List<TargetNode> participants = new ArrayList<>();
 
             for (JsonNode client : root) {
-                    String clientId = client.path("clientId").asText();
-                    if (!clientId.startsWith("did:web")) {
-                        continue; // skip this client
-                    }
+                String clientId = client.path("clientId").asText();
+                if (!clientId.startsWith("did:web")) {
+                    continue; // skip this client
+                }
 
-                    System.out.println("KeycloakHttpClient.parseParticipantsToTargetNode, new participant 2");
-                    System.out.println(".. clientId: " + clientId);
-                    participants.add(new KeycloakParticipant(clientId).toTargetNode());
+                System.out.println("KeycloakHttpClient.parseParticipantsToTargetNode, new participant");
+                System.out.println(".. clientId: " + clientId);
+                KeycloakParticipant participant = new KeycloakParticipant(clientId);
+                TargetNode targetNode = participant.toTargetNode();
+                if (targetNode != null) {
+                    participants.add(targetNode);
+                } else {
+                    System.out.println("KeycloakHttpClient.parseParticipantsToTargetNode, not resolved, not added to the lilst");
+                }
             }
 
             return participants;

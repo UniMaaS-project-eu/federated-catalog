@@ -95,7 +95,8 @@ public class KeycloakParticipant {
             System.err.println("TargetNode ID = " + target.id());
             return target;
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Failed to resolve DID document: " + e.getMessage(), e);
+            System.err.println("Failed to resolve DID document: " + e.getMessage());
+            return null;
         }
     }
 }
