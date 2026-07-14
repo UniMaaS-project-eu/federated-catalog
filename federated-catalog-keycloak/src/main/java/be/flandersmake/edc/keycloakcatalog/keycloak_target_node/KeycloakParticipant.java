@@ -38,14 +38,19 @@ public class KeycloakParticipant {
         String did_url = java.net.URLDecoder.decode(encodedHostPort, java.nio.charset.StandardCharsets.UTF_8);
 
         // participant name
-        name = parts[parts.length - 1];
+        name = parts.length>1 ? parts[1] : null;
 
         return resolveFromDidWeb(did_url, name);
     }
 
     public static TargetNode resolveFromDidWeb(String didWebUrl, String connectorName) {
         try {
-            String didJsonUrl = "http://" + didWebUrl + "/.well-known/did.json";
+            String didJsonUrl;
+            if ( connectorName==null){
+                didJsonUrl = "http://" + didWebUrl + "/.well-known/did.json";
+            } else {
+                didJsonUrl = "http://" + didWebUrl + "/" + connectorName + "/.well-known/did.json";
+            } 
             System.out.println("Get did url:" + didJsonUrl);
 
             // Fetch DID document
