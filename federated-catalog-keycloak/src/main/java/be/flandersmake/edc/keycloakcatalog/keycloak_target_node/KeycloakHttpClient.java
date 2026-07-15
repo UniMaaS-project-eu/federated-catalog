@@ -28,6 +28,7 @@ public class KeycloakHttpClient {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
+    // constructor
     public KeycloakHttpClient(KeycloakParticipantsService.KeykloadConfiguration keycloakConfiguration) {
         this.admin_user = keycloakConfiguration.admin_user();
         this.admin_password = keycloakConfiguration.admin_password();
@@ -40,6 +41,7 @@ public class KeycloakHttpClient {
         this.token = this.InitializeToken(null);
     }
 
+    // return the access token if successful
     public String InitializeToken(String token) {
         if (token != null) {
             return token;
@@ -67,11 +69,11 @@ public class KeycloakHttpClient {
                 JsonNode json = mapper.readTree(response.body());
                 return json.get("access_token").asText();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                System.err.println(
+                        String.format("KeycloakHttpClient.InitializeToken: failed, reason %s", e.getMessage()));
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                System.err.println(
+                        String.format("KeycloakHttpClient.InitializeToken: failed, reason %s", e.getMessage()));
             }
             return null;
         }
@@ -91,11 +93,11 @@ public class KeycloakHttpClient {
             response = http_client.send(request, HttpResponse.BodyHandlers.ofString());
             return parseParticipantsToTargetNode(response.body());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            System.err.println(
+                    String.format("KeycloakHttpClient.getParticipantsTargetNode: failed, reason %s", e.toString()));
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            System.err.println(
+                    String.format("KeycloakHttpClient.getParticipantsTargetNode: failed, reason %s", e.toString()));
         }
         return participants;
 
@@ -125,7 +127,7 @@ public class KeycloakHttpClient {
                 if (targetNode != null) {
                     participants.add(targetNode);
                 } else {
-                    System.out.println("KeycloakHttpClient.parseParticipantsToTargetNode, not resolved, not added to the lilst");
+                    System.out.println(".... client not resolved, not added to the list");
                 }
             }
 

@@ -51,7 +51,7 @@ public class KeycloakParticipant {
             } else {
                 didJsonUrl = "http://" + didWebUrl + "/" + connectorName + "/.well-known/did.json";
             }
-            System.out.println("Get did url:" + didJsonUrl);
+            System.out.println(String.format(".... did url: %s", didJsonUrl));
 
             // Fetch DID document
             HttpClient client = HttpClient.newHttpClient();
@@ -93,21 +93,27 @@ public class KeycloakParticipant {
                                                  */
 
                 // Build TargetNode
-                System.err.println("Target node from did:" + rawDid + " name:" + connectorName + " url:" + catalogUrl);
-                // TargetNode target = new TargetNode(connectorName, rawDid, catalogUrl,
-                // List.of("dataspace-protocol-http"));
-                TargetNode target = new TargetNode(connectorName, rawDid, catalogUrl,
+                System.out.println(String.format(".... TargetNode url %s", catalogUrl));
+
+                TargetNode target = new TargetNode(
+                        connectorName,
+                        rawDid,
+                        catalogUrl,
                         List.of("dataspace-protocol-http"));
 
-                System.err.println("TargetNode ID = " + target.id());
+                System.out.println(String.format(".... TargetNode ID %s", target.id()));
                 return target;
 
             } else {
-                System.err.println("Response code is not 200 but " + response.statusCode());
+                System.out.println(String.format(
+                        ".... client did not resolved, response is not 200, but %d",
+                        response.statusCode()));
                 return null;
             }
         } catch (IOException | InterruptedException | NullPointerException e) {
-            System.err.println("Failed to resolve DID document: " + e.getMessage());
+            System.out.println(String.format(
+                    ".... client did not resolved, reason %s",
+                    e.toString()));
             return null;
         }
     }
