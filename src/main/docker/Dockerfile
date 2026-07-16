@@ -24,4 +24,4 @@ ENV ENV_JVM_ARGS=$JVM_ARGS
 ENV ENV_APPINSIGHTS_AGENT_VERSION=$APPINSIGHTS_AGENT_VERSION
 
 # keycloak config path for now for testing purposes - should be moved somewhere afterwards
-ENTRYPOINT [ "sh", "-c", "exec java $ENV_JVM_ARGS -jar standalone-federated-catalog.jar --log-level=debug"]
+ENTRYPOINT [ "sh", "-c", "exec java $ENV_JVM_ARGS -Dedc.fs.config=/etc/app/env-file -jar standalone-federated-catalog.jar --log-level=debug"]
