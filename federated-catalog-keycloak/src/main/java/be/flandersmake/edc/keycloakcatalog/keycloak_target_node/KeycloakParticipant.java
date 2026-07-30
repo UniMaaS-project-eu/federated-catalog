@@ -74,7 +74,7 @@ public class KeycloakParticipant {
                 String dspEndpoint = null;
                 for (JsonNode svc : services) {
                     if (svc.has("type") &&
-                            (svc.get("type").asText().equalsIgnoreCase("ProtocolEndpoint")
+                            (svc.get("type").asText().equalsIgnoreCase("DataspaceConnector")
                                     || svc.get("type").asText().equalsIgnoreCase("DataspaceProtocol"))) {
                         dspEndpoint = svc.get("serviceEndpoint").asText();
                         break;
