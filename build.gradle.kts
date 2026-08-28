@@ -34,7 +34,7 @@ dependencies {
     //my extensions
     //implementation(project(":extensions:federated-catalog-keycloak"))
 
-    if (project.properties.getOrDefault("persistence", "false") == "true") {
+    if (project.properties.getOrDefault("persistence", "true") == "true") {
         runtimeOnly(libs.edc.vault.hashicorp)
         runtimeOnly(libs.bundles.sql.edc)
         runtimeOnly(libs.edc.sts.remote.client)
