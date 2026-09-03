@@ -34,11 +34,10 @@ dependencies {
     //my extensions
     //implementation(project(":extensions:federated-catalog-keycloak"))
 
-    if (project.properties.getOrDefault("persistence", "true") == "true") {
+    if (project.properties.getOrDefault("UseVaulAndSts", "true") == "true") {
         runtimeOnly(libs.edc.vault.hashicorp)
-        runtimeOnly(libs.bundles.sql.edc)
         runtimeOnly(libs.edc.sts.remote.client)
-        println("This runtime compiles with a remote STS client, Hashicorp Vault and PostgreSQL. You will need properly configured Postgres and HCV instances.")
+        println("This runtime compiles with a remote STS client and Hashicorp Vault. You will need properly configured HCV instances.")
     }
 }
 
