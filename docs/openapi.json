@@ -1,0 +1,228 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Access API for the federated catalog of UniMaaS",
+    "description": "Access API for the federated catalog of UniMaaS.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Read Root",
+        "description": "Function to indicate the API is running",
+        "operationId": "read_root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datasets": {
+      "post": {
+        "summary": "Get Datasets With Optional Filters",
+        "description": "Returns the filtered datasets filtered with the fitlers given in a JSON object.",
+        "operationId": "get_datasets_with_optional_filters_datasets_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/DatasetFilters"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Ds Filters"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "title": "Response Get Datasets With Optional Filters Datasets Post"
+                },
+                "example": [
+                  {
+                    "@id": "id1",
+                    "dcat:dataset": {
+                      "metadata_tag1": "value1",
+                      "metadata_tag2": "value2"
+                    },
+                    "dspace:participantId": "participant_id1"
+                  },
+                  {
+                    "@id": "id2",
+                    "dspace:participantId": "participant_id2"
+                  },
+                  {
+                    "@id": "id3",
+                    "dcat:dataset": {
+                      "metadata_tag1": "value1",
+                      "metadata_tag2": "value2"
+                    },
+                    "dspace:participantId": "participant_id3"
+                  }
+                ]
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DatasetFilters": {
+        "properties": {
+          "@id": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "description": "Dataset identifiers to match."
+          },
+          "dcat:dataset": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "description": "Metadata properties the dataset must contain."
+          },
+          "dspace:participantId": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "description": "Participant identifiers to match."
+          }
+        },
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "items": {
+
+              },
+              "type": "array"
+            },
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "type": "object",
+        "title": "DatasetFilters",
+        "description": "Filters to narrow down the datasets.\n\nA JSON object where each key is a metadata property and each value holds\nthe values to match. Send an empty object (or no body) to get all datasets.",
+        "examples": [
+          {
+            "@context": {
+              "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
+              "dcat": "http://www.w3.org/ns/dcat#",
+              "dspace": "https://w3id.org/dspace/v0.8/"
+            },
+            "@id": [],
+            "dcat:dataset": [
+              {
+                "http://www.w3.org/ns/msc_dms#description": "Dataset 2 for Internal Processes from ttl file"
+              },
+              "http://www.w3.org/ns/msc_dms#aboutProcess",
+              "http://www.w3.org/ns/msc_dms#relatedSpatialRegion",
+              "http://www.w3.org/ns/msc_dms#name",
+              {
+                "odrl:hasPolicy": [
+                  "odrl:obligation"
+                ]
+              }
+            ],
+            "dspace:participantId": []
+          }
+        ]
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
