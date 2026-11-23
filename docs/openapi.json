@@ -9,7 +9,7 @@
     "/": {
       "get": {
         "summary": "Read Root",
-        "description": "Function to indicate the API is running",
+        "description": "Indicate that the API is running",
         "operationId": "read_root__get",
         "responses": {
           "200": {
